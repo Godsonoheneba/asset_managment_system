@@ -39,7 +39,3 @@ If you find any bug, and a fix for that bug, please leave a comment on the githu
 ## DON'T FORGET TO GIVE ME FEEDBACK
 
 - - - -
-
-follow at twitter @KirinyetBrian 
-
-Don't forget to visit https://kirinyetbrian.github.io/
