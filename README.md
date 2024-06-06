@@ -16,9 +16,9 @@ If you find any bug, and a fix for that bug, please leave a comment on the githu
 ****
 
 
-1. Download the latest version with git (`https://github.com/KirinyetBrian/Maranet`)
+1. Download the latest version with git (`https://github.com/Godsonoheneba/asset_managment_system`)
 
-2. Import/load oswa_inv.sql into your mysql database. This should set up the basic structure of the database system.
+2. Import/load ams.sql into your mysql database. This should set up the basic structure of the database system.
 
 3. Modify the includes/config.php and change the variables to match your host, database, username and passwords.
 
