@@ -4,9 +4,11 @@
   if($session->isUserLoggedIn(true)) { redirect('home.php', false);}
 ?>
 <?php include_once('layouts/header.php'); ?>
-<div class="login-page" style="height:auto;">
+<div class="login-page" style="height:500px; width:500px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); border-radius: 10px;" >
     <div class="text-center">
-<img src="./logo.jpeg" alt="user-image" class="logo pull-left" style="width:300px; margin-top: 10px !important;" />
+      <br>
+      <br>
+<img src="./logo.jpeg" alt="user-image" class="logo pull-left" style="width:400px; margin-top: 10px !important;" />
 
 <br>
 <br>
