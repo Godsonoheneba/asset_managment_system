@@ -183,46 +183,88 @@ function tableExists($table){
   /*--------------------------------------------------------------*/
   /* Function for cheaking which user level has access to page
   /*--------------------------------------------------------------*/
-   function page_require_level($require_level){
-     global $session;
-     $current_user = current_user();
-     $login_level = find_by_groupLevel($current_user['user_level']);
-     //if user not login
-     if (!$session->isUserLoggedIn(true)):
-            $session->msg('d','Please login...');
-            redirect('index.php', false);
-      //if Group status Deactive
-     elseif($login_level['group_status'] === '0'):
-           $session->msg('d','This level user has been band!');
-           redirect('home.php',false);
-      //cheackin log in User level and Require level is Less than or equal to
-     elseif($current_user['user_level'] <= (int)$require_level):
-              return true;
-      else:
-            $session->msg("d", "Sorry! you dont have permission to view the page.");
-            redirect('home.php', false);
-        endif;
+  function page_require_level($require_level) {
+    global $session;
+    $current_user = current_user();
+    $login_level = find_by_groupLevel($current_user['user_level']);
 
-     }
+    // Check if the username and password are the same
+    check_username_password_match();
+
+    // If user not logged in
+    if (!$session->isUserLoggedIn(true)) {
+        $session->msg('d', 'Please login...');
+        redirect('index.php', false);
+    }
+    // If group status is deactivated
+    elseif ($login_level['group_status'] === '0') {
+        $session->msg('d', 'This level user has been banned!');
+        redirect('home.php', false);
+    }
+    // Check if the user's level is less than or equal to the required level
+    elseif ($current_user['user_level'] <= (int)$require_level) {
+        return true;
+    } else {
+        $session->msg("d", "Sorry! you don't have permission to view the page.");
+        redirect('home.php', false);
+    }
+}
+
+
+
+function check_username_password_match() {
+  global $session;
+  $current_user = current_user();
+
+  // Retrieve the username and password hash
+  $username = isset($current_user['username']) ? $current_user['username'] : 'N/A';
+  $password_hash = isset($current_user['password']) ? $current_user['password'] : 'N/A'; // Assuming this is the SHA-1 hashed password
+
+
+  if (sha1($username) === $password_hash) {
+      // If they match, redirect to the change password page
+      $session->msg('d', 'Welcome! It looks like this is your first time logging in. For security reasons, please change your password.');
+
+        // Debug output
+  echo "Username: " . $username . "<br>";
+  echo "Password Hash: " . $password_hash . "<br>";
+      redirect('change_password_first_time.php', false);
+  }
+}
+  
    /*--------------------------------------------------------------*/
    /* Function for Finding all product name
    /* JOIN with categorie  and media database table
    /*--------------------------------------------------------------*/
-  function join_product_table(){
-     global $db;
-     $sql  =" SELECT A.id,A.assetname,A.description,A.purpose,A.owner,A.financial_value,A.location,A.date,
-     A.returns,A.dateOfReturn,A.status,A.comments,A.media_id ";    
-    $sql  .=" AS assettype,m.file_name AS image, ";
-     $sql  .=" c.Type AS Type, "; 
-     $sql .= "c.id as ID"; 
-    $sql  .=" FROM assets A ";
-    $sql  .=" INNER JOIN assettype c ON c.id = A.assettype_id "; 
-    $sql  .=" LEFT JOIN media m ON m.id = A.media_id ";
-    $sql  .=" ORDER BY A.id ASC ";
+  // function join_product_table(){
+  //    global $db;
+  //    $sql  =" SELECT A.id,A.assetname,A.description,A.financial_value,A.date,
+  //    A.returns,A.status,A.comments,A.media_id,A.asset_id,A.qr_code ";    
+  //   $sql  .=" AS assettype,m.file_name AS image, ";
+  //    $sql  .=" c.Type AS Type, "; 
+  //    $sql .= "c.id as ID"; 
+  //   $sql  .=" FROM assets A ";
+  //   $sql  .=" INNER JOIN assettype c ON c.id = A.assettype_id "; 
+  //   $sql  .=" LEFT JOIN media m ON m.id = A.media_id ";
+  //   $sql  .=" ORDER BY A.id ASC ";
     
-    return find_by_sql($sql);
+  //   return find_by_sql($sql);
 
-   }
+  //  }
+
+  function join_product_table(){
+    global $db;
+    $sql  = "SELECT A.id, A.assetname, A.description, A.financial_value, A.date, ";
+    $sql .= "A.returns, A.status, A.comments, A.media_id, A.asset_id, A.qr_code, ";
+    $sql .= "m.file_name AS image, c.Type AS Type, c.id AS ID ";
+    $sql .= "FROM assets A ";
+    $sql .= "INNER JOIN assettype c ON c.id = A.assettype_id ";
+    $sql .= "LEFT JOIN media m ON m.id = A.media_id ";
+    $sql .= "ORDER BY A.id ASC";
+
+    return find_by_sql($sql);
+}
+
 
 
   /*--------------------------------------------------------------*/
@@ -369,5 +411,64 @@ function  monthlySales($year){
   $sql .= " ORDER BY date_format(s.date, '%c' ) ASC";
   return find_by_sql($sql);
 }
+
+
+/*--------------------------------------------------------------*/
+/* Function to add a log entry
+/*--------------------------------------------------------------*/
+function add_log($user_id, $username, $action) {
+  global $db;
+  $user_id = (int)$user_id;
+  $username = $db->escape($username);
+  $action = $db->escape($action);
+
+  $sql = "INSERT INTO logs (user_id, username, action) VALUES ('{$user_id}', '{$username}', '{$action}')";
+  $result = $db->query($sql);
+
+  return ($result && $db->affected_rows() === 1 ? true : false);
+}
+
+
+/*--------------------------------------------------------------*/
+/* Function to retrieve all logs
+/*--------------------------------------------------------------*/
+function find_all_logs() {
+  return find_by_sql("SELECT * FROM logs ORDER BY timestamp DESC");
+}
+
+/*--------------------------------------------------------------*/
+/* Function to retrieve a log by ID
+/*--------------------------------------------------------------*/
+function find_log_by_id($id) {
+  global $db;
+  $id = (int)$id;
+  $sql = "SELECT * FROM logs WHERE id = '{$db->escape($id)}' LIMIT 1";
+  $result = find_by_sql($sql);
+  return (!empty($result) ? array_shift($result) : null);
+}
+
+/*--------------------------------------------------------------*/
+/* Function to update a log entry by ID
+/*--------------------------------------------------------------*/
+function update_log($id, $action) {
+  global $db;
+  $id = (int)$id;
+  $action = $db->escape($action);
+  $sql = "UPDATE logs SET action='{$action}' WHERE id='{$id}'";
+  $result = $db->query($sql);
+  return ($result && $db->affected_rows() === 1 ? true : false);
+}
+
+/*--------------------------------------------------------------*/
+/* Function to delete a log by ID
+/*--------------------------------------------------------------*/
+function delete_log_by_id($id) {
+  global $db;
+  $id = (int)$id;
+  $sql = "DELETE FROM logs WHERE id='{$id}' LIMIT 1";
+  $result = $db->query($sql);
+  return ($result && $db->affected_rows() === 1 ? true : false);
+}
+
 
 ?>

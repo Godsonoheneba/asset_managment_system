@@ -2,21 +2,21 @@
   $page_title = 'Add User';
   require_once('includes/load.php');
   // Checkin What level user has permission to view this page
-  page_require_level(1);
+  page_require_level(1,2);
   $groups = find_all('user_groups');
 ?>
 <?php
   if(isset($_POST['add_user'])){
 
-   $req_fields = array('full-name','username','password','level' );
+   $req_fields = array('full-name','username','level' );
    validate_fields($req_fields);
 
    if(empty($errors)){
            $name   = remove_junk($db->escape($_POST['full-name']));
        $username   = remove_junk($db->escape($_POST['username']));
-       $password   = remove_junk($db->escape($_POST['password']));
+      //  $password   = remove_junk($db->escape($_POST['password']));
        $user_level = (int)$db->escape($_POST['level']);
-       $password = sha1($password);
+       $password = sha1($username);
         $query = "INSERT INTO users (";
         $query .="name,username,password,user_level,status";
         $query .=") VALUES (";
@@ -58,10 +58,10 @@
                 <label for="username">Username</label>
                 <input type="text" class="form-control" name="username" placeholder="Username">
             </div>
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" class="form-control" name ="password"  placeholder="Password">
-            </div>
+            </div> -->
             <div class="form-group">
               <label for="level">User Role</label>
                 <select class="form-control" name="level">

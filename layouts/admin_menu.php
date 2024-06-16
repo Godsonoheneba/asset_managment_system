@@ -39,12 +39,15 @@
        <li><a href="add_product.php">Add Asset</a> </li>
    </ul>
   </li>
+
+
   <li>
     <a href="media.php" >
       <i class="glyphicon glyphicon-picture"></i>
       <span>Media</span>
     </a>
   </li>
+  
  <!-- <li> 
     <a href="#" class="submenu-toggle">
       <i class="glyphicon glyphicon-th-list"></i>
@@ -69,10 +72,10 @@
       -->
       </ul>
   </li>
-  <!-- <li>
-    <a href="export/index.php">
+  <li>
+    <a href="view_logs.php">
       <i class="glyphicon glyphicon-home"></i>
-      <span>Export to Excel</span>
+      <span>Logs</span>
     </a>
-  </li> -->
+  </li>
 </ul>

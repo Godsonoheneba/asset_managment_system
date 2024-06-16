@@ -2,6 +2,8 @@
   $page_title = 'Home Page';
   require_once('includes/load.php');
   if (!$session->isUserLoggedIn(true)) { redirect('index.php', false); }
+
+  check_username_password_match();
 ?>
 <?php include_once('layouts/header.php'); ?>
 <div class="row">
